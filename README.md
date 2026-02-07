@@ -32,6 +32,23 @@ We introduce a novel U.S.-wide dataset collected from **Google Earth** imagery c
 | **Schools** | Educational institutions | Athletic fields, bus loops |
 | **Single-family** | Detached homes | Individual lots, varied rooflines |
 
+### 📸 Sample Building Images
+
+<table>
+<tr>
+<td align="center"><b>Commercial</b><br><img src="results/figures/commercial.png" width="150"/></td>
+<td align="center"><b>High-rise</b><br><img src="results/figures/highrise.png" width="150"/></td>
+<td align="center"><b>Hospital</b><br><img src="results/figures/hospital.png" width="150"/></td>
+<td align="center"><b>Industrial</b><br><img src="results/figures/industrial.png" width="150"/></td>
+</tr>
+<tr>
+<td align="center"><b>Multi-family</b><br><img src="results/figures/multi.png" width="150"/></td>
+<td align="center"><b>Schools</b><br><img src="results/figures/schools.png" width="150"/></td>
+<td align="center"><b>Single-family</b><br><img src="results/figures/single.png" width="150"/></td>
+<td align="center"><i>512×512 px<br>~0.15 m/pixel</i></td>
+</tr>
+</table>
+
 ---
 
 ## 🔬 Methodology
@@ -122,6 +139,25 @@ Hyperparameters from **Table 4** in the paper:
 
 ⚠️ **Challenging Classes**: Commercial (F1=0.69)
 - Often confused with Multi-family due to similar footprint patterns
+
+### 🔍 Classification Example
+
+Here's an example of how the model classifies a building:
+
+| Input Image | Prediction |
+|:-----------:|:-----------|
+| <img src="results/figures/highrise.png" width="200"/> | **Predicted Class:** High-rise<br>**Confidence:** 95%<br>**Ground Truth:** High-rise ✅ |
+
+**Probability Distribution:**
+```
+Commercial   ████░░░░░░░░░░░░░░░░  2.1%
+High-rise    ████████████████████  95.0%  ◄ Predicted
+Hospital     ░░░░░░░░░░░░░░░░░░░░  0.5%
+Industrial   ░░░░░░░░░░░░░░░░░░░░  0.3%
+Multi-family █░░░░░░░░░░░░░░░░░░░  1.2%
+Schools      ░░░░░░░░░░░░░░░░░░░░  0.4%
+Single       ░░░░░░░░░░░░░░░░░░░░  0.5%
+```
 
 ---
 
