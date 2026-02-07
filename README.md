@@ -1,33 +1,127 @@
-# Building Classification using DenseNet201
+# 🏗️ Building Classification from Aerial Imagery using DenseNet201
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange.svg)](https://tensorflow.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Accuracy](https://img.shields.io/badge/Test%20Accuracy-84.40%25-success.svg)](#-model-performance)
 
-Deep learning-based building classification from aerial/satellite imagery using DenseNet201 transfer learning. This repository contains the code, sample dataset, and trained models accompanying our research paper.
+A deep learning pipeline for classifying buildings from satellite imagery into **7 distinct categories** using DenseNet201 with integrated segmentation. This repository accompanies our research paper on automated building classification.
 
 ---
 
-## 🏗️ Overview
+## 📋 Abstract
 
-This project presents a **DenseNet201-based convolutional neural network** for classifying buildings from aerial imagery into **7 distinct categories**:
+Building classification from aerial imagery is crucial for urban planning, infrastructure evaluation, environmental monitoring, and disaster response. This research presents a **two-stage deep learning pipeline** combining:
 
-| Category | Description |
-|----------|-------------|
-| **Commercial** | Retail stores, shopping centers, office buildings |
-| **High-rise** | Multi-story residential/commercial towers |
-| **Hospital** | Healthcare facilities |
-| **Industrial** | Factories, warehouses, manufacturing plants |
-| **Multi-family** | Apartments, condominiums, townhouses |
-| **Schools** | Educational institutions |
-| **Single-family** | Detached residential homes |
+1. **ReFineNet Segmentation** - Precise building footprint extraction
+2. **DenseNet201 Classification** - Multi-class building type prediction
 
-### Key Features
+We introduce a novel U.S.-wide dataset collected from **Google Earth** imagery covering diverse geographic regions and architectural styles. Our model achieves **84.40% test accuracy** across 7 building categories.
 
-- 🔬 **Transfer Learning**: Pre-trained DenseNet201 backbone fine-tuned for building classification
-- 🌐 **Google Earth Data**: 512×512 pixel images at ~0.15 m/pixel resolution via samgeo
-- 🏛️ **7 Building Classes**: Comprehensive taxonomy covering major urban building types
-- 🔧 **Segmentation Pipeline**: ReFineNet + watershed algorithm for building extraction
+---
+
+## 🎯 Building Classes
+
+| Class | Description | Example Characteristics |
+|-------|-------------|------------------------|
+| **Commercial** | Retail, offices, shopping centers | Large footprints, parking lots |
+| **High-rise** | Multi-story towers (>10 floors) | Vertical structures, small footprint |
+| **Hospital** | Healthcare facilities | H-shaped, helicopter pads |
+| **Industrial** | Factories, warehouses | Large flat roofs, loading docks |
+| **Multi-family** | Apartments, condos | Clustered units, regular patterns |
+| **Schools** | Educational institutions | Athletic fields, bus loops |
+| **Single-family** | Detached homes | Individual lots, varied rooflines |
+
+---
+
+## 🔬 Methodology
+
+### Pipeline Architecture
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐     ┌────────────────┐
+│  Google Earth   │────▶│   ReFineNet      │────▶│   DenseNet201   │────▶│  Building      │
+│  Satellite      │     │   Segmentation   │     │   Classifier    │     │  Class         │
+│  512×512 @ 0.15m│     │   + Watershed    │     │   (7 classes)   │     │  Prediction    │
+└─────────────────┘     └──────────────────┘     └─────────────────┘     └────────────────┘
+```
+
+### Key Technical Components
+
+**Data Acquisition (§3.1.1)**
+- Source: Google Earth via [segment-geospatial](https://github.com/opengeos/segment-geospatial) (samgeo)
+- Resolution: 512×512 pixels at ~0.15 m/pixel
+- Coverage: 50 U.S. states with diverse architectural styles
+
+**Segmentation Module (§3.2)**
+- ReFineNet pretrained network for building footprint extraction
+- Test-Time Augmentation (TTA) with H/V flips for robust masks
+- Morphological opening + watershed algorithm for overlapping buildings
+- Size filtering: 500-100,000 pixels per building segment
+
+**Classification Model (§3.2)**
+- Backbone: DenseNet201 (ImageNet pretrained)
+- Head: GAP → Dense(256, ReLU, L2=0.001) → Dropout(0.5) → Softmax(7)
+
+---
+
+## ⚙️ Training Configuration
+
+Hyperparameters from **Table 4** in the paper:
+
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| Optimizer | Adam | β₁=0.9, β₂=0.999 |
+| Learning Rate | 1e-4 | Reduced on plateau |
+| Batch Size | 32 | Balanced memory/speed |
+| Max Epochs | 20 | Early stopping applied |
+| Dropout Rate | 0.5 | FC layer regularization |
+| L2 Regularization | 0.001 | Dense layer |
+| Early Stopping | patience=3 | Restore best weights |
+| LR Scheduler | ReduceLROnPlateau | factor=0.2, patience=2 |
+
+**Data Augmentation:**
+- Horizontal/Vertical flips
+- Rotation: ±15°
+- Zoom: 90-110%
+- Brightness adjustment
+
+**Data Split:** 80% train / 10% validation / 10% test
+
+---
+
+## 📊 Model Performance
+
+### Overall Metrics
+
+| Metric | Score |
+|--------|-------|
+| **Test Accuracy** | **84.40%** |
+| **Validation Accuracy** | 84.39% |
+| **Training Accuracy** | >95% |
+| **Macro F1-Score** | 0.84 |
+| **Weighted F1-Score** | 0.84 |
+
+### Per-Class Performance (Table 5)
+
+| Class | Precision | Recall | F1-Score | Support |
+|-------|:---------:|:------:|:--------:|:-------:|
+| Commercial | 0.80 | 0.60 | 0.69 | 20 |
+| **High-rise** | **0.95** | 0.90 | **0.92** | 20 |
+| Hospital | 0.84 | 0.80 | 0.82 | 20 |
+| Industrial | 0.83 | **0.95** | 0.89 | 21 |
+| Multi-family | 0.77 | 0.85 | 0.81 | 20 |
+| Schools | 0.77 | 0.85 | 0.81 | 20 |
+| **Single-family** | **0.95** | **0.95** | **0.95** | 20 |
+| **Overall** | **0.85** | **0.84** | **0.84** | **141** |
+
+### Key Findings
+
+✅ **Best Performance**: Single-family (F1=0.95) and High-rise (F1=0.92)
+- Distinct architectural features make classification easier
+
+⚠️ **Challenging Classes**: Commercial (F1=0.69)
+- Often confused with Multi-family due to similar footprint patterns
 
 ---
 
@@ -35,146 +129,112 @@ This project presents a **DenseNet201-based convolutional neural network** for c
 
 ```
 building-classification/
-├── README.md                    # This file
-├── LICENSE                      # MIT License
-├── CITATION.cff                 # Citation metadata
-├── requirements.txt             # Python dependencies
-├── .gitignore                   # Git ignore rules
+├── 📄 README.md                 # This file
+├── 📄 LICENSE                   # MIT License
+├── 📄 CITATION.cff              # Citation metadata
+├── 📄 requirements.txt          # Python dependencies
 │
-├── paper/                       # Research paper
-│   └── Building_Classification_Research_Paper.docx
+├── 📁 notebooks/
+│   ├── 01_data_collection.ipynb           # Satellite image acquisition
+│   ├── 02_preprocessing_segmentation.ipynb # ReFineNet + watershed
+│   ├── 03_model_training.ipynb            # DenseNet201 training
+│   └── 04_evaluation_inference.ipynb      # Metrics & predictions
 │
-├── notebooks/
-│   ├── 01_data_collection.ipynb        # Satellite image acquisition via samgeo
-│   ├── 02_preprocessing_segmentation.ipynb  # ReFineNet + morphological ops
-│   ├── 03_model_training.ipynb         # DenseNet201 training with paper hyperparams
-│   └── 04_evaluation_inference.ipynb   # Metrics, confusion matrix, predictions
+├── 📁 data/
+│   └── processed/               # Train/Val/Test splits
+│       ├── train/               # 80% of data
+│       ├── val/                 # 10% of data
+│       └── test/                # 10% of data (141 images)
 │
-├── data/
-│   ├── processed/               # Organized image dataset
-│   │   ├── train/               # Training images (80%)
-│   │   ├── val/                 # Validation images (10%)
-│   │   └── test/                # Test images (10%)
-│   │
-│   └── metadata/                # CSV metadata files
+├── 📁 models/                   # Trained weights
+│   └── README.md                # Download instructions
 │
-├── models/                      # Trained model weights
-│   └── README.md                # Model download instructions
+├── 📁 results/                  # Figures & metrics
+│   └── figures/
 │
-└── results/                     # Evaluation results & figures
+└── 📁 paper/                    # Research paper
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- Python 3.8+
-- CUDA-compatible GPU (recommended for training)
-
 ### Installation
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/madhugoutham/building-classification.git
 cd building-classification
 
-# Create virtual environment
+# Create environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 ```
 
-### Running Notebooks
-
-1. **Data Collection**: `notebooks/01_data_collection.ipynb`
-2. **Preprocessing**: `notebooks/02_preprocessing_segmentation.ipynb`
-3. **Training**: `notebooks/03_model_training.ipynb`
-4. **Evaluation**: `notebooks/04_evaluation_inference.ipynb`
-
-### Quick Inference
+### Inference Example
 
 ```python
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
 
-# Load trained model
+# Load model
 model = load_model('models/densenet201_best.h5')
 
-# Class labels
-classes = ['Commercial', 'High', 'Hospital', 'Industrial', 'Multi', 'Schools', 'Single']
-
-# Load and preprocess image
-img = image.load_img('path/to/building.tif', target_size=(224, 224))
-img_array = image.img_to_array(img) / 255.0
-img_array = np.expand_dims(img_array, axis=0)
+# Building classes
+CLASSES = ['Commercial', 'High', 'Hospital', 'Industrial', 
+           'Multi', 'Schools', 'Single']
 
 # Predict
-predictions = model.predict(img_array)
-predicted_class = classes[np.argmax(predictions)]
-confidence = np.max(predictions) * 100
-print(f"Predicted: {predicted_class} ({confidence:.1f}%)")
+img = image.load_img('building.tif', target_size=(224, 224))
+x = image.img_to_array(img) / 255.0
+x = np.expand_dims(x, axis=0)
+
+pred = model.predict(x)
+print(f"Predicted: {CLASSES[np.argmax(pred)]} ({np.max(pred)*100:.1f}%)")
 ```
 
 ---
 
-## 📊 Model Performance
+## 📚 Comparison with Related Work
 
-| Metric | Score |
-|--------|-------|
-| **Overall Test Accuracy** | 84.40% |
-| **Validation Accuracy** | 84.39% |
-| **Macro F1-Score** | 0.84 |
-| **Weighted F1-Score** | 0.84 |
-
-### Per-Class Performance
-
-| Class | Precision | Recall | F1-Score | Support |
-|-------|-----------|--------|----------|---------|
-| Commercial | 0.80 | 0.60 | 0.69 | 20 |
-| High-rise | 0.95 | 0.90 | 0.92 | 20 |
-| Hospital | 0.84 | 0.80 | 0.82 | 20 |
-| Industrial | 0.83 | 0.95 | 0.89 | 21 |
-| Multi-family | 0.77 | 0.85 | 0.81 | 20 |
-| Schools | 0.77 | 0.85 | 0.81 | 20 |
-| Single-family | 0.95 | 0.95 | 0.95 | 20 |
+| Study | Year | Classes | Accuracy | Region |
+|-------|------|---------|----------|--------|
+| Helber et al. (EuroSAT) | 2019 | 10 land-use | 98.57% | Europe |
+| Atwal et al. (OSM) | 2022 | 2 | 98% | US (3 counties) |
+| Dimassi et al. (BBTC) | 2021 | 2 | 94.8% | Lebanon |
+| Erdem & Avdan (Inria) | 2020 | Binary | 87.69% | US (Chicago) |
+| **This Work** | **2025** | **7** | **84.40%** | **US (nationwide)** |
 
 ---
 
-## 🧠 Model Architecture
+## 🔧 Requirements
 
-**Hyperparameters (Table 4 in paper):**
+- Python 3.8+
+- TensorFlow 2.x
+- CUDA GPU (recommended for training)
+- 8GB+ RAM
 
-| Parameter | Value |
-|-----------|-------|
-| Optimizer | Adam (β1=0.9, β2=0.999) |
-| Learning Rate | 1e-4 (reduced on plateau) |
-| Batch Size | 32 |
-| Epochs | Up to 20 (early stopping) |
-| Dropout Rate | 0.5 |
-| L2 Regularization | 0.001 |
+See [requirements.txt](requirements.txt) for full dependencies.
 
 ---
 
-## 📥 Trained Models
+## 📥 Model Weights
 
-Model weights are hosted externally due to file size:
+Pre-trained model weights (hosted externally due to size):
 
-| Model | Description | Download |
-|-------|-------------|----------|
-| `densenet201_best.h5` | Best performing model | [Coming Soon] |
+| Model | Size | Description |
+|-------|------|-------------|
+| `densenet201_best.h5` | ~80MB | Best validation accuracy |
 
-See `models/README.md` for download instructions.
+See [models/README.md](models/README.md) for download instructions.
 
 ---
 
-## 📚 Citation
-
-If you use this code or dataset in your research, please cite:
+## 📖 Citation
 
 ```bibtex
 @article{author2025building,
@@ -185,22 +245,25 @@ If you use this code or dataset in your research, please cite:
 }
 ```
 
+See [CITATION.cff](CITATION.cff) for machine-readable citation.
+
 ---
 
 ## 📜 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
 ## 🙏 Acknowledgments
 
-- Google Earth for satellite imagery
-- [segment-geospatial (samgeo)](https://github.com/opengeos/segment-geospatial) for image acquisition
-- TensorFlow/Keras team for DenseNet201 implementation
+- **Google Earth** for satellite imagery
+- **[segment-geospatial](https://github.com/opengeos/segment-geospatial)** (samgeo) for image acquisition
+- **TensorFlow/Keras** for DenseNet201 implementation
+- **ReFineNet** for building segmentation
 
 ---
 
 ## 📧 Contact
 
-For questions or collaboration inquiries, please open an issue or contact the authors.
+For questions, issues, or collaboration inquiries, please [open an issue](https://github.com/madhugoutham/building-classification/issues).
