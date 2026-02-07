@@ -57,6 +57,10 @@ We introduce a novel U.S.-wide dataset collected from **Google Earth** imagery c
 - **Combined (Full)**: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18513307.svg)](https://doi.org/10.5281/zenodo.18513307)
   - Contains 18,147 unique images for extended research.
 
+### 🧠 Model Availability
+- **DenseNet201 (Best Model)**: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18513710.svg)](https://doi.org/10.5281/zenodo.18513710)
+  - Pre-trained weights (`.h5`) achieving 84.40% accuracy.
+
 The dataset includes 7 building classes:
 - **Commercial**
 - **High-rise**

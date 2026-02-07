@@ -17,6 +17,9 @@ identifiers:
   - description: "Combined Dataset (Full)"
     type: doi
     value: "10.5281/zenodo.18513307"
+  - description: "DenseNet201 Model (Best)"
+    type: doi
+    value: "10.5281/zenodo.18513710"
 keywords:
   - building classification
   - deep learning
