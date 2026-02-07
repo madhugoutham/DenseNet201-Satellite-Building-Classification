@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Building Classification from Aerial Imagery using DenseNet201"
+version: 1.0.0
+date-released: 2025-02-06
+url: "https://github.com/YOUR_USERNAME/building-classification"
+repository-code: "https://github.com/YOUR_USERNAME/building-classification"
+license: MIT
+authors:
+  - family-names: "Author"
+    given-names: "Name"
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+keywords:
+  - building classification
+  - deep learning
+  - DenseNet201
+  - aerial imagery
+  - computer vision
+  - transfer learning
+abstract: >-
+  A deep learning approach for classifying buildings from aerial imagery
+  into seven categories (Commercial, High-rise, Hospital, Industrial,
+  Multi-family, Schools, Single-family) using DenseNet201 transfer learning.

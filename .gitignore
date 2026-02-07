@@ -1,0 +1,50 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Model files (too large for git - use LFS or external hosting)
+*.h5
+*.hdf5
+*.pb
+*.keras
+*.weights
+
+# Large data folders (keep sample data only)
+Madhu RA Work Folder*/
+newdata/
+building_images_2/
+misclassified_buildings/
+
+# Logs and outputs
+logs/
+*.log
+tensorboard_logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Data cache
+*.pkl
+*.pickle
+notebooks/03_inference/02_model_evaluation.ipynb
