@@ -1,36 +1,37 @@
-# 🏗️ Building Classification from Aerial Imagery using DenseNet201
+# 🏗️ Building Type Classification from Aerial Imagery using DenseNet201
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange.svg)](https://tensorflow.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Accuracy](https://img.shields.io/badge/Test%20Accuracy-84.40%25-success.svg)](#-model-performance)
 
-A deep learning pipeline for classifying buildings from satellite imagery into **7 distinct categories** using DenseNet201 with integrated segmentation. This repository accompanies our research paper on automated building classification.
+A deep learning pipeline for **building type classification** from high-resolution aerial imagery into **7 classes**, using a **two-stage workflow**:
+1) **RefineNet-based segmentation** + post-processing to extract building instances  
+2) **DenseNet201** to classify each building crop
+
+This repository accompanies our manuscript on automated building classification at U.S. nationwide scale.
 
 ---
 
 ## 📋 Abstract
 
-Building classification from aerial imagery is crucial for urban planning, infrastructure evaluation, environmental monitoring, and disaster response. This research presents a **two-stage deep learning pipeline** combining:
+Building classification from aerial imagery supports urban planning, infrastructure assessment, environmental monitoring, and disaster response. We present a **two-stage deep learning pipeline** that first isolates building footprints using **RefineNet segmentation** with robust post-processing, then classifies the extracted building crops with a **DenseNet201** classifier.
 
-1. **ReFineNet Segmentation** - Precise building footprint extraction
-2. **DenseNet201 Classification** - Multi-class building type prediction
-
-We introduce a novel U.S.-wide dataset collected from **Google Earth** imagery covering diverse geographic regions and architectural styles. Our model achieves **84.40% test accuracy** across 7 building categories.
+We curate a nationwide dataset of **11,921** building samples from **Google Earth** imagery spanning **50 U.S. states**, covering diverse architectural styles and geographic regions. The proposed approach achieves **84.40%** test accuracy across 7 building classes.
 
 ---
 
 ## 🎯 Building Classes
 
 | Class | Description | Example Characteristics |
-|-------|-------------|------------------------|
+|------|-------------|------------------------|
 | **Commercial** | Retail, offices, shopping centers | Large footprints, parking lots |
-| **High-rise** | Multi-story towers (>10 floors) | Vertical structures, small footprint |
-| **Hospital** | Healthcare facilities | H-shaped, helicopter pads |
-| **Industrial** | Factories, warehouses | Large flat roofs, loading docks |
-| **Multi-family** | Apartments, condos | Clustered units, regular patterns |
-| **Schools** | Educational institutions | Athletic fields, bus loops |
-| **Single-family** | Detached homes | Individual lots, varied rooflines |
+| **High-rise** | Multi-story towers (>10 floors) | Vertical structures, smaller footprint |
+| **Hospital** | Healthcare facilities | Complex layouts (e.g., H-shapes), helipads |
+| **Industrial** | Factories, warehouses | Large flat roofs, loading bays |
+| **Multi-unit Residential** | Apartments, condos | Clustered units, regular patterns |
+| **School** | Educational institutions | Athletic fields, bus loops |
+| **Single-unit Residential** | Detached homes | Individual lots, varied rooflines |
 
 ### 📸 Sample Building Images
 
@@ -51,24 +52,18 @@ We introduce a novel U.S.-wide dataset collected from **Google Earth** imagery c
 
 ---
 
-## 📊 Dataset Availability
-- **Phase 2 (Paper Dataset)**: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18512944.svg)](https://doi.org/10.5281/zenodo.18512944)
-  - Contains the 1,553 images used to achieve 84.40% accuracy.
-- **Combined (Full)**: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18513307.svg)](https://doi.org/10.5281/zenodo.18513307)
-  - Contains 18,147 unique images for extended research.
+## 📊 Dataset & Model Availability (Zenodo)
 
-### 🧠 Model Availability
+### Dataset Records
+- **Paper Dataset (indices + labels / reproducibility bundle)**: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18512944.svg)](https://doi.org/10.5281/zenodo.18512944)
+- **Combined / Extended Research Bundle**: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18513307.svg)](https://doi.org/10.5281/zenodo.18513307)
+
+### 🧠 Model Weights
 - **DenseNet201 (Best Model)**: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18513710.svg)](https://doi.org/10.5281/zenodo.18513710)
-  - Pre-trained weights (`.h5`) achieving 84.40% accuracy.
+  - Pre-trained weights (`.h5`) corresponding to the reported performance.
 
-The dataset includes 7 building classes:
-- **Commercial**
-- **High-rise**
-- **Hospital**
-- **Industrial**
-- **Multi-family**
-- **Schools**
-- **Single-family**
+> **Important licensing note (Google Earth imagery):**  
+> Google Earth imagery is subject to third-party terms and may restrict redistribution of raw tiles. This repository is designed to support **reproducibility** by providing scripts and metadata to reconstruct imagery under the user’s own compliant access. Please follow your institution’s and provider’s licensing requirements.
 
 ---
 
@@ -84,12 +79,13 @@ The dataset includes 7 building classes:
 └─────────────────┘     └──────────────────┘     └─────────────────┘     └────────────────┘
 ```
 
-### Key Technical Components
+### Data Acquisition
+- Source: Google Earth imagery acquired via **segment-geospatial (samgeo)**  
+- Resolution: **512×512 px** at approximately **0.15 m/pixel**
+- Coverage: **50 U.S. states** (diverse architectural and geographic variation)
 
-**Data Acquisition (§3.1.1)**
-- Source: Google Earth via [segment-geospatial](https://github.com/opengeos/segment-geospatial) (samgeo)
-- Resolution: 512×512 pixels at ~0.15 m/pixel
-- Coverage: 50 U.S. states with diverse architectural styles
+### Leakage-Safe Geographic Splitting
+To avoid geographic leakage, we create splits using grouped sampling so that **no city/tile group appears across train/val/test simultaneously**. This supports a more honest estimate of generalization to unseen locations.
 
 ---
 
