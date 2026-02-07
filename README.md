@@ -363,4 +363,4 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 
 ## 📧 Contact
 
-For questions, issues, or collaboration inquiries, please [open an issue](https://github.com/madhugoutham/building-classification/issues).
+For questions, issues, or collaboration inquiries, please [open an issue](https://github.com/madhugoutham/DenseNet201-Satellite-Building-Classification/issues).

@@ -4,8 +4,8 @@ type: software
 title: "Building Classification from Aerial Imagery using DenseNet201"
 version: 1.0.0
 date-released: 2025-02-06
-url: "https://github.com/madhugoutham/building-classification"
-repository-code: "https://github.com/madhugoutham/building-classification"
+url: "https://github.com/madhugoutham/DenseNet201-Satellite-Building-Classification"
+repository-code: "https://github.com/madhugoutham/DenseNet201-Satellite-Building-Classification"
 license: MIT
 authors:
   - family-names: "Ambati"
