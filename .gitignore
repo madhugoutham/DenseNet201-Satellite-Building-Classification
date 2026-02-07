@@ -48,3 +48,10 @@ tensorboard_logs/
 *.pkl
 *.pickle
 notebooks/03_inference/02_model_evaluation.ipynb
+
+# Large Dataset Files
+*.zip
+dataset_for_zenodo/
+combined_dataset/
+phase2_dataset/
+Madhu RA Work Folder*/

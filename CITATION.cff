@@ -4,13 +4,19 @@ type: software
 title: "Building Classification from Aerial Imagery using DenseNet201"
 version: 1.0.0
 date-released: 2025-02-06
-url: "https://github.com/YOUR_USERNAME/building-classification"
-repository-code: "https://github.com/YOUR_USERNAME/building-classification"
+url: "https://github.com/madhugoutham/building-classification"
+repository-code: "https://github.com/madhugoutham/building-classification"
 license: MIT
 authors:
-  - family-names: "Author"
-    given-names: "Name"
-    orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: "Ambati"
+    given-names: "Madhu Goutham"
+identifiers:
+  - description: "Phase 2 Dataset (Paper)"
+    type: doi
+    value: "10.5281/zenodo.18512944"
+  - description: "Combined Dataset (Full)"
+    type: doi
+    value: "10.5281/zenodo.18513307"
 keywords:
   - building classification
   - deep learning

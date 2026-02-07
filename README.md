@@ -51,6 +51,23 @@ We introduce a novel U.S.-wide dataset collected from **Google Earth** imagery c
 
 ---
 
+## 📊 Dataset Availability
+- **Phase 2 (Paper Dataset)**: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18512944.svg)](https://doi.org/10.5281/zenodo.18512944)
+  - Contains the 1,553 images used to achieve 84.40% accuracy.
+- **Combined (Full)**: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18513307.svg)](https://doi.org/10.5281/zenodo.18513307)
+  - Contains 18,147 unique images for extended research.
+
+The dataset includes 7 building classes:
+- **Commercial**
+- **High-rise**
+- **Hospital**
+- **Industrial**
+- **Multi-family**
+- **Schools**
+- **Single-family**
+
+---
+
 ## 🔬 Methodology
 
 ### Pipeline Architecture
