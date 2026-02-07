@@ -25,9 +25,9 @@ This project presents a **DenseNet201-based convolutional neural network** for c
 ### Key Features
 
 - 🔬 **Transfer Learning**: Pre-trained DenseNet201 backbone fine-tuned for building classification
-- 📊 **K-Fold Cross Validation**: Robust model evaluation with 5-fold cross-validation
-- 🗺️ **Geographic Coverage**: Data from DeKalb County and Cook County, Illinois
-- 📐 **512×512 Image Patches**: High-resolution aerial imagery from NAIP
+- 🌐 **Google Earth Data**: 512×512 pixel images at ~0.15 m/pixel resolution via samgeo
+- 🏛️ **7 Building Classes**: Comprehensive taxonomy covering major urban building types
+- 🔧 **Segmentation Pipeline**: ReFineNet + watershed algorithm for building extraction
 
 ---
 
@@ -45,40 +45,23 @@ building-classification/
 │   └── Building_Classification_Research_Paper.docx
 │
 ├── notebooks/
-│   ├── 01_data_collection/      # Data acquisition scripts
-│   │   ├── 01_patch_csv_generator.ipynb
-│   │   ├── 02_image_patch_downloading.ipynb
-│   │   ├── 03_download_buildings_by_zipcode.ipynb
-│   │   ├── 04_data_collector.ipynb
-│   │   └── 05_image_collection.ipynb
-│   │
-│   ├── 02_model_training/       # Model training notebooks
-│   │   ├── 01_densenet201_training.ipynb
-│   │   ├── 02_cross_validation_training.ipynb
-│   │   ├── 03_model_classification.ipynb
-│   │   └── 04_building_classification_model.ipynb
-│   │
-│   └── 03_inference/            # Prediction & evaluation
-│       ├── 01_building_prediction.ipynb
-│       ├── 02_model_evaluation.ipynb
-│       └── 03_new_prediction.ipynb
+│   ├── 01_data_collection.ipynb        # Satellite image acquisition via samgeo
+│   ├── 02_preprocessing_segmentation.ipynb  # ReFineNet + morphological ops
+│   ├── 03_model_training.ipynb         # DenseNet201 training with paper hyperparams
+│   └── 04_evaluation_inference.ipynb   # Metrics, confusion matrix, predictions
 │
 ├── data/
 │   ├── processed/               # Organized image dataset
-│   │   ├── train/               # Training images (~70%)
-│   │   ├── val/                 # Validation images (~15%)
-│   │   └── test/                # Test images (~15%)
+│   │   ├── train/               # Training images (80%)
+│   │   ├── val/                 # Validation images (10%)
+│   │   └── test/                # Test images (10%)
 │   │
 │   └── metadata/                # CSV metadata files
-│       ├── buildings_metadata.csv
-│       └── output_predictions.csv
 │
 ├── models/                      # Trained model weights
 │   └── README.md                # Model download instructions
 │
-└── results/                     # Evaluation results
-    ├── figures/
-    └── confusion_matrices/
+└── results/                     # Evaluation results & figures
 ```
 
 ---
@@ -94,7 +77,7 @@ building-classification/
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/building-classification.git
+git clone https://github.com/madhugoutham/building-classification.git
 cd building-classification
 
 # Create virtual environment
@@ -105,7 +88,14 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Running Inference
+### Running Notebooks
+
+1. **Data Collection**: `notebooks/01_data_collection.ipynb`
+2. **Preprocessing**: `notebooks/02_preprocessing_segmentation.ipynb`
+3. **Training**: `notebooks/03_model_training.ipynb`
+4. **Evaluation**: `notebooks/04_evaluation_inference.ipynb`
+
+### Quick Inference
 
 ```python
 from tensorflow.keras.models import load_model
@@ -120,13 +110,14 @@ classes = ['Commercial', 'High', 'Hospital', 'Industrial', 'Multi', 'Schools', '
 
 # Load and preprocess image
 img = image.load_img('path/to/building.tif', target_size=(224, 224))
-img_array = image.img_to_array(img)
-img_array = np.expand_dims(img_array, axis=0) / 255.0
+img_array = image.img_to_array(img) / 255.0
+img_array = np.expand_dims(img_array, axis=0)
 
 # Predict
 predictions = model.predict(img_array)
 predicted_class = classes[np.argmax(predictions)]
-print(f"Predicted class: {predicted_class}")
+confidence = np.max(predictions) * 100
+print(f"Predicted: {predicted_class} ({confidence:.1f}%)")
 ```
 
 ---
@@ -135,22 +126,49 @@ print(f"Predicted class: {predicted_class}")
 
 | Metric | Score |
 |--------|-------|
-| **Overall Accuracy** | TBD |
-| **Weighted F1-Score** | TBD |
-| **Macro F1-Score** | TBD |
+| **Overall Test Accuracy** | 84.40% |
+| **Validation Accuracy** | 84.39% |
+| **Macro F1-Score** | 0.84 |
+| **Weighted F1-Score** | 0.84 |
 
-*Detailed confusion matrices and per-class metrics available in `results/`*
+### Per-Class Performance
+
+| Class | Precision | Recall | F1-Score | Support |
+|-------|-----------|--------|----------|---------|
+| Commercial | 0.80 | 0.60 | 0.69 | 20 |
+| High-rise | 0.95 | 0.90 | 0.92 | 20 |
+| Hospital | 0.84 | 0.80 | 0.82 | 20 |
+| Industrial | 0.83 | 0.95 | 0.89 | 21 |
+| Multi-family | 0.77 | 0.85 | 0.81 | 20 |
+| Schools | 0.77 | 0.85 | 0.81 | 20 |
+| Single-family | 0.95 | 0.95 | 0.95 | 20 |
+
+---
+
+## 🧠 Model Architecture
+
+**Hyperparameters (Table 4 in paper):**
+
+| Parameter | Value |
+|-----------|-------|
+| Optimizer | Adam (β1=0.9, β2=0.999) |
+| Learning Rate | 1e-4 (reduced on plateau) |
+| Batch Size | 32 |
+| Epochs | Up to 20 (early stopping) |
+| Dropout Rate | 0.5 |
+| L2 Regularization | 0.001 |
 
 ---
 
 ## 📥 Trained Models
 
-Due to file size limitations, trained model weights are hosted externally:
+Model weights are hosted externally due to file size:
 
 | Model | Description | Download |
 |-------|-------------|----------|
 | `densenet201_best.h5` | Best performing model | [Coming Soon] |
-| `densenet201_fold_*.h5` | K-fold cross-validation models | [Coming Soon] |
+
+See `models/README.md` for download instructions.
 
 ---
 
@@ -177,8 +195,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- NAIP (National Agriculture Imagery Program) for aerial imagery
-- Microsoft Building Footprints for building polygons
+- Google Earth for satellite imagery
+- [segment-geospatial (samgeo)](https://github.com/opengeos/segment-geospatial) for image acquisition
 - TensorFlow/Keras team for DenseNet201 implementation
 
 ---
