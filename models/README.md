@@ -16,25 +16,21 @@ This directory contains trained DenseNet201 model weights for building classific
 
 ## Download Instructions
 
-Due to GitHub's file size limitations (100 MB), model weights are hosted externally.
+Due to GitHub's file size limitations (100 MB), model weights are hosted on Zenodo.
 
-### Option 1: Direct Download
-*[Download link coming soon]*
+### 📥 Download via Zenodo (Recommended)
+You can download the best performing model directly from Zenodo:
 
-### Option 2: Using gdown (Google Drive)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18513710.svg)](https://doi.org/10.5281/zenodo.18513710)
+
+1. Go to the [Zenodo Record](https://doi.org/10.5281/zenodo.18513710).
+2. Download `DenseNet201_Best_Model.h5` (138 MB).
+3. Place the file in this `models/` directory.
+
+### using Python script
+Run the provided script to download automatically:
 ```bash
-pip install gdown
-gdown "YOUR_GOOGLE_DRIVE_LINK" -O models/densenet201_best.h5
-```
-
-### Option 3: Hugging Face Hub
-```python
-from huggingface_hub import hf_hub_download
-
-model_path = hf_hub_download(
-    repo_id="YOUR_USERNAME/building-classification",
-    filename="densenet201_best.h5"
-)
+python download_model.py
 ```
 
 ## Usage
