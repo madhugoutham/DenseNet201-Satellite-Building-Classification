@@ -104,11 +104,17 @@ Our segmentation module extracts individual building footprints from satellite i
 | 6️⃣ | **Watershed** | Separate connected/overlapping buildings | Meyer, 1994 |
 | 7️⃣ | **Size Filtering** | Keep segments with 500-100,000 pixels | §3.2 |
 
-### 📸 Segmentation Example
+### 📸 Segmentation Pipeline Visualization
 
-| Original Image | Segmentation Mask | Watershed Labels | Detected Buildings |
-|:--------------:|:-----------------:|:----------------:|:------------------:|
-| <img src="results/figures/commercial.png" width="150"/> | Binary mask showing building footprints | Color-coded individual segments | Bounding boxes around each building |
+<p align="center">
+<img src="results/figures/segmentation_pipeline.png" width="800"/>
+</p>
+
+**Pipeline Steps:**
+1. **Original** - High-resolution satellite imagery (512×512 px)
+2. **Binary Mask** - Building footprints extracted by ReFineNet
+3. **Watershed Labels** - Individual buildings separated with color-coded regions
+4. **Detected Buildings** - Final output with green bounding boxes
 
 > *"Post-processing further refined these masks by applying morphological opening to eliminate small artifacts and reduce noise, followed by the watershed algorithm, chosen for its efficacy in segmenting connected or overlapping building structures."* — Paper §3.2
 
