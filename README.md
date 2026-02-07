@@ -70,11 +70,49 @@ We introduce a novel U.S.-wide dataset collected from **Google Earth** imagery c
 - Resolution: 512×512 pixels at ~0.15 m/pixel
 - Coverage: 50 U.S. states with diverse architectural styles
 
-**Segmentation Module (§3.2)**
-- ReFineNet pretrained network for building footprint extraction
-- Test-Time Augmentation (TTA) with H/V flips for robust masks
-- Morphological opening + watershed algorithm for overlapping buildings
-- Size filtering: 500-100,000 pixels per building segment
+---
+
+## 🔍 Segmentation Pipeline (§3.2)
+
+Our segmentation module extracts individual building footprints from satellite imagery using a multi-stage approach:
+
+### Segmentation Architecture
+
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   INPUT     │    │   TTA       │    │  REFINENET  │    │  MORPH OPS  │    │  WATERSHED  │
+│  512×512    │───▶│  H/V Flip   │───▶│  Building   │───▶│  Opening    │───▶│  Algorithm  │
+│  Satellite  │    │  4 versions │    │  Masks      │    │  Clean up   │    │  Separate   │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    └──────┬──────┘
+                                                                                   │
+                   ┌─────────────┐    ┌─────────────┐    ┌─────────────┐          │
+                   │  BUILDING   │◀───│   SIZE      │◀───│   LABELED   │◀─────────┘
+                   │   CROPS     │    │   FILTER    │    │   REGIONS   │
+                   │  for CNN    │    │ 500-100K px │    │             │
+                   └─────────────┘    └─────────────┘    └─────────────┘
+```
+
+### Step-by-Step Process
+
+| Step | Operation | Description | Paper Reference |
+|:----:|-----------|-------------|-----------------|
+| 1️⃣ | **Preprocessing** | Resize to 512×512, normalize pixels to [0,1] | §3.2 |
+| 2️⃣ | **TTA** | Generate H-flip, V-flip, HV-flip versions | §3.2 |
+| 3️⃣ | **ReFineNet** | Pretrained semantic segmentation network | Lin et al., 2017 |
+| 4️⃣ | **Averaging** | Average TTA predictions for robust masks | §3.2 |
+| 5️⃣ | **Morphological Opening** | Remove small artifacts and noise | §3.2 |
+| 6️⃣ | **Watershed** | Separate connected/overlapping buildings | Meyer, 1994 |
+| 7️⃣ | **Size Filtering** | Keep segments with 500-100,000 pixels | §3.2 |
+
+### 📸 Segmentation Example
+
+| Original Image | Segmentation Mask | Watershed Labels | Detected Buildings |
+|:--------------:|:-----------------:|:----------------:|:------------------:|
+| <img src="results/figures/commercial.png" width="150"/> | Binary mask showing building footprints | Color-coded individual segments | Bounding boxes around each building |
+
+> *"Post-processing further refined these masks by applying morphological opening to eliminate small artifacts and reduce noise, followed by the watershed algorithm, chosen for its efficacy in segmenting connected or overlapping building structures."* — Paper §3.2
+
+---
 
 **Classification Model (§3.2)**
 - Backbone: DenseNet201 (ImageNet pretrained)
