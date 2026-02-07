@@ -338,11 +338,12 @@ See [models/README.md](models/README.md) for download instructions.
 ## 📖 Citation
 
 ```bibtex
-@article{author2025building,
-  title={Building Classification from Aerial Imagery using DenseNet201},
-  author={Author Name},
-  journal={Journal Name},
-  year={2025}
+@article{building_classification_2025,
+  title={Building Type Classification in Satellite Imagery Using DenseNet201},
+  author={Ambati, Madhu Goutham and Shaikh, Abdul Rahman},
+  year={2025},
+  publisher={Zenodo},
+  doi={10.5281/zenodo.18512944}
 }
 ```
 

@@ -10,6 +10,9 @@ license: MIT
 authors:
   - family-names: "Ambati"
     given-names: "Madhu Goutham"
+  - family-names: "Shaikh"
+    given-names: "Abdul Rahman"
+    alias: "sabdulrahman"
 identifiers:
   - description: "Phase 2 Dataset (Paper)"
     type: doi
